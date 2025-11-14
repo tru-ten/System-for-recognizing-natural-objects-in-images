@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Про систему</title>
+    <link rel="icon" href="static/favicon.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #334155;
+            padding: 1rem 2rem;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #3b82f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            color: #34d399;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #60a5fa 0%, #34d399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #60a5fa;
+        }
+
+        .card p {
+            color: #94a3b8;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .card ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .card li {
+            color: #94a3b8;
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .card li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #34d399;
+            font-weight: bold;
+        }
+
+        .full-width-card {
+            grid-column: 1 / -1;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .tech-badge {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            color: #60a5fa;
+            font-size: 0.875rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(51, 65, 85, 0.3);
+            border-radius: 8px;
+            border: 1px solid #475569;
+        }
+
+        .feature-item .icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-item h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            color: #60a5fa;
+        }
+
+        .feature-item p {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-text">
+                    <h1>Система розпізнавання об'єктів природного походження</h1>
+                    <p>Про систему</p>
+                </div>
+            </div>
+            <a href="/" class="nav-link">
+                Назад до панелі керування
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Про систему розпізнавання об'єктів</h1>
+            <p>
+                Прикладна система детекції об'єктів на базі нейронної мережі YOLO (You Only Look Once), 
+                яка забезпечує швидке та точне розпізнавання об'єктів на зображеннях в режимі реального часу.
+            </p>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <h2>Що таке YOLO?</h2>
+                <p>
+                    YOLO (You Only Look Once) — це сучасна архітектура нейронної мережі для детекції об'єктів, 
+                    яка обробляє зображення за один прохід, що робить її надзвичайно швидкою.
+                </p>
+                <p>
+                    На відміну від традиційних методів, YOLO аналізує все зображення цілком, що дозволяє 
+                    врахувати контекст та знизити кількість хибних спрацювань.
+                </p>
+            </div>
+
+            <div class="card">
+                <h2>Переваги системи</h2>
+                <ul>
+                    <li>Висока швидкість обробки зображень</li>
+                    <li>Точне визначення об'єктів та їх координат</li>
+                    <li>Підтримка множинної детекції</li>
+                    <li>Інтуїтивний веб-інтерфейс</li>
+                    <li>Детальна статистика та візуалізація</li>
+                    <li>Експорт результатів</li>
+                </ul>
+            </div>
+
+            <div class="card full-width-card">
+                <h2>Технологічний стек</h2>
+                <p>
+                    Система побудована з використанням сучасних технологій машинного навчання та веб-розробки:
+                </p>
+                <div class="tech-stack">
+                    <div class="tech-badge">Python</div>
+                    <div class="tech-badge">YOLO (Ultralytics)</div>
+                    <div class="tech-badge">Flask API</div>
+                    <div class="tech-badge">HTML/CSS/JavaScript</div>
+                    <div class="tech-badge">Chart.js</div>
+                    <div class="tech-badge">OpenCV</div>
+                    <div class="tech-badge">NumPy</div>
+                </div>
+            </div>
+
+            <div class="card full-width-card">
+                <h2>Функціональні можливості</h2>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <h3>Завантаження</h3>
+                        <p>Drag & drop або вибір файлів для швидкого завантаження зображень</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Детекція</h3>
+                        <p>Автоматичне виявлення та класифікація об'єктів з високою точністю</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Аналітика</h3>
+                        <p>Детальна статистика з графіками розподілу класів</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Список детекцій</h3>
+                        <p>Повний перелік знайдених об'єктів з координатами та впевненістю</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Історія</h3>
+                        <p>Збереження останніх 10 обробок для швидкого доступу</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Експорт</h3>
+                        <p>Збереження результатів у форматі зображення</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Як працює система?</h2>
+                <p><strong>1. Завантаження:</strong> Користувач завантажує зображення через веб-інтерфейс</p>
+                <p><strong>2. Обробка:</strong> Зображення передається на сервер для аналізу нейронною мережею</p>
+                <p><strong>3. Детекція:</strong> YOLO модель виявляє об'єкти та визначає їх координати</p>
+                <p><strong>4. Візуалізація:</strong> Результати відображаються з bounding boxes та статистикою</p>
+                <p><strong>5. Експорт:</strong> Можливість завантажити оброблене зображення</p>
+            </div>
+
+            <div class="card">
+                <h2>Застосування</h2>
+                <p>Система може використовуватися для:</p>
+                <ul>
+                    <li>Моніторингу природи</li>
+                    <li>Екологічних досліджень та спостережень</li>
+                    <li>Аналізу біорізноманіття</li>
+                    <li>Вивчення поведінки тварин у природних умовах</li>
+                    <li>Навчальних та наукових проектів з біології</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

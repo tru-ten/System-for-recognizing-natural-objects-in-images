@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система розпізнавання об'єктів природного походження</title>
+    <link rel="icon" href="static/favicon.png" type="image/png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #334155;
+            padding: 1rem 2rem;
+        }
+
+        .header a {
+            color: #60a5fa;
+            text-decoration: none;
+            font-weight: 600;
+            margin-right: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .version-tag {
+            opacity: 0.7;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 179, 255, 0.1);
+            border: 1px solid rgba(0, 179, 255, 0.3);
+            border-radius: 8px;
+            color: #34d399;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            background: rgba(0, 179, 255, 0.2);
+            border-color: rgba(0, 179, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #3b82f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed #475569;
+            border-radius: 8px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-zone:hover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .upload-zone.dragover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+        }
+
+        .slider-container {
+            margin: 1.5rem 0;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #334155;
+            outline: none;
+            appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #2563eb;
+        }
+
+        .btn-primary:disabled {
+            background: #334155;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            display: none;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .error-box.show {
+            display: flex;
+        }
+
+        .error-icon {
+            color: #ef4444;
+            font-size: 1.25rem;
+        }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .image-container {
+            text-align: center;
+        }
+
+        .image-container p {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .image-container img {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+
+        .stat-card {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-card.green {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-value.blue {
+            color: #3b82f6;
+        }
+
+        .stat-value.green {
+            color: #10b981;
+        }
+
+        .detection-list {
+            max-height: 400px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .detection-item {
+            background: rgba(51, 65, 85, 0.5);
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+
+        .detection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .detection-class {
+            font-weight: 600;
+            color: #60a5fa;
+        }
+
+        .detection-confidence {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .detection-bbox {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .history-item {
+            background: rgba(51, 65, 85, 0.5);
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .history-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        .history-tag {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .chart-container {
+            margin-top: 1rem;
+            height: 300px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .clear-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem;
+            transition: color 0.3s;
+        }
+
+        .clear-btn:hover {
+            color: #dc2626;
+        }
+
+        @media (max-width: 1024px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-text">
+                    <h1>Система розпізнавання об'єктів природного походження</h1>
+                    <p>Панель керування розпізнаванням об'єктів у режимі реального часу</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="/about" class="nav-link">Про систему</a>
+                <span class="version-tag">версія: 1.0</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="grid">
+            <!-- Основний зміст -->
+            <div>
+                <!-- Завантажити картку -->
+                <div class="card">
+                    <h2 class="card-title">Завантажити зображення</h2>
+                    
+                    <div class="upload-zone" id="uploadZone">
+                        <p>Перетягніть зображення або клацніть, щоб вибрати</p>
+                        <p style="font-size: 0.75rem; color: #64748b; margin-top: 0.5rem;">Підтримує: JPG, PNG, JPEG</p>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*">
+
+                    <div class="button-group">
+                        <button class="btn btn-primary" id="detectBtn" disabled>
+                            Розпізнавання об'єктів
+                        </button>
+                        <button class="btn btn-success hidden" id="exportBtn">
+                            Експорт
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Поле помилок -->
+                <div class="error-box" id="errorBox">
+                    <div>
+                        <strong>Помилка</strong>
+                        <p id="errorMessage"></p>
+                    </div>
+                </div>
+
+                <!-- Картка результатів -->
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h2 class="card-title">Результати</h2>
+                    <div class="images-grid" id="imagesGrid">
+                        <p style="text-align: center; color: #64748b; grid-column: 1 / -1;">Завантажте зображення, щоб розпочати</p>
+                    </div>
+                </div>
+
+                <!-- Картка діаграми -->
+                <div class="card hidden" id="chartCard" style="margin-top: 1.5rem;">
+                    <h2 class="card-title">Розподіл класів</h2>
+                    <div class="chart-container">
+                        <canvas id="chartCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Бічна панель -->
+            <div class="sidebar">
+                <!-- Картка статистики -->
+                <div class="card">
+                    <h2 class="card-title">Статистика</h2>
+                    <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                        <div class="stat-card">
+                            <div class="stat-label">Всього об'єктів</div>
+                            <div class="stat-value blue" id="totalObjects">0</div>
+                        </div>
+                        <div class="stat-card green">
+                            <div class="stat-label">Унікальні класи</div>
+                            <div class="stat-value green" id="uniqueClasses">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Картка виявлення -->
+                <div class="card hidden" id="detectionsCard">
+                    <h2 class="card-title">Розпізнавання</h2>
+                    <div class="detection-list" id="detectionsList"></div>
+                </div>
+
+                <!-- Картка для історії -->
+                <div class="card hidden" id="historyCard">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h2 class="card-title" style="margin: 0;">Історія</h2>
+                        <button class="clear-btn" id="clearHistoryBtn">Очистити</button>
+                    </div>
+                    <div class="history-list" id="historyList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Змінні
+        let selectedImage = null;
+        let resultImageUrl = null;
+        let detections = [];
+        let classCounts = {};
+        let history = [];
+        let chart = null;
+
+        const API_URL = 'http://localhost:5000/api';
+
+        // Елементи
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const confidenceValue = document.getElementById('confidenceValue');
+        const detectBtn = document.getElementById('detectBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const errorBox = document.getElementById('errorBox');
+        const errorMessage = document.getElementById('errorMessage');
+        const imagesGrid = document.getElementById('imagesGrid');
+        const totalObjects = document.getElementById('totalObjects');
+        const uniqueClasses = document.getElementById('uniqueClasses');
+        const detectionsCard = document.getElementById('detectionsCard');
+        const detectionsList = document.getElementById('detectionsList');
+        const historyCard = document.getElementById('historyCard');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        const chartCard = document.getElementById('chartCard');
+        const chartCanvas = document.getElementById('chartCanvas');
+
+        // Слухачі подій
+        uploadZone.addEventListener('click', () => fileInput.click());
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+        uploadZone.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+        detectBtn.addEventListener('click', handleDetect);
+        exportBtn.addEventListener('click', exportResults);
+        clearHistoryBtn.addEventListener('click', clearHistory);
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                loadImage(file);
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                loadImage(file);
+            }
+        }
+
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                selectedImage = e.target.result;
+                displayOriginalImage();
+                detectBtn.disabled = false;
+                hideError();
+                resetResults();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function displayOriginalImage() {
+            imagesGrid.innerHTML = `
+                <div class="image-container">
+                    <p>Оригінал</p>
+                    <img src="${selectedImage}" alt="Original">
+                </div>
+            `;
+        }
+
+        function resetResults() {
+            detections = [];
+            classCounts = {};
+            resultImageUrl = null;
+            updateStatistics();
+            detectionsCard.classList.add('hidden');
+            chartCard.classList.add('hidden');
+            exportBtn.classList.add('hidden');
+        }
+
+        async function handleDetect() {
+            if (!selectedImage) return;
+
+            detectBtn.disabled = true;
+            detectBtn.innerHTML = '<div class="spinner"></div> Обробка...';
+            hideError();
+
+            try {
+                const blob = await fetch(selectedImage).then(r => r.blob());
+                const formData = new FormData();
+                formData.append('image', blob, 'image.jpg');
+
+                const response = await fetch(`${API_URL}/detect`, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data);
+                    addToHistory(data);
+                } else {
+                    showError(data.error || 'Detection failed');
+                }
+            } catch (err) {
+                showError('Failed to connect to API. Make sure the Flask server is running on http://localhost:5000');
+                console.error(err);
+            } finally {
+                detectBtn.disabled = false;
+                detectBtn.innerHTML = "Розпізнавання об'єктів";
+            }
+        }
+
+        function displayResults(data) {
+            detections = data.detections;
+            classCounts = data.class_counts;
+            resultImageUrl = data.image;
+
+            // Відображення зображень
+            imagesGrid.innerHTML = `
+                <div class="image-container">
+                    <p>Оригінал</p>
+                    <img src="${selectedImage}" alt="Original">
+                </div>
+                <div class="image-container">
+                    <p>Виявлено</p>
+                    <img src="${resultImageUrl}" alt="Result">
+                </div>
+            `;
+
+            // Оновити статистику
+            updateStatistics();
+
+            // Відображення списку виявлених об'єктів
+            displayDetections();
+
+            // Відображення діаграми
+            displayChart();
+
+            // Показати кнопку експорту
+            exportBtn.classList.remove('hidden');
+        }
+
+        function updateStatistics() {
+            totalObjects.textContent = detections.length;
+            uniqueClasses.textContent = Object.keys(classCounts).length;
+        }
+
+        function displayDetections() {
+            if (detections.length === 0) {
+                detectionsCard.classList.add('hidden');
+                return;
+            }
+
+            detectionsCard.classList.remove('hidden');
+            detectionsList.innerHTML = detections.map(det => `
+                <div class="detection-item">
+                    <div class="detection-header">
+                        <span class="detection-class">${det.class}</span>
+                        <span class="detection-confidence">${(det.confidence * 100).toFixed(1)}%</span>
+                    </div>
+                    <div class="detection-bbox">Box: [${det.bbox.map(v => v.toFixed(0)).join(', ')}]</div>
+                </div>
+            `).join('');
+        }
+
+        function displayChart() {
+            if (Object.keys(classCounts).length === 0) {
+                chartCard.classList.add('hidden');
+                return;
+            }
+
+            chartCard.classList.remove('hidden');
+
+            const labels = Object.keys(classCounts);
+            const data = Object.values(classCounts);
+
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(chartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Count',
+                        data: data,
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#9ca3af' },
+                            grid: { color: '#374151' }
+                        },
+                        x: {
+                            ticks: { color: '#9ca3af' },
+                            grid: { color: '#374151' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Завантажувати історію з localStorage під час запуску
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedHistory = localStorage.getItem('detectionHistory');
+            if (savedHistory) {
+                history = JSON.parse(savedHistory);
+                displayHistory();
+            }
+        });
+
+
+        function addToHistory(data) {
+            const historyItem = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleTimeString(),
+                total: data.total_objects,
+                classes: data.class_counts,
+                image:data.image,
+                detections:data.detections
+            };
+
+            history.unshift(historyItem);
+            history = history.slice(0, 10);
+
+            // Зберегти в локальному сховищі
+            localStorage.setItem('detectionHistory', JSON.stringify(history));
+
+            displayHistory();
+        }
+
+        function displayHistory() {
+            if (history.length === 0) {
+                historyCard.classList.add('hidden');
+                return;
+            }
+
+            historyCard.classList.remove('hidden');
+            historyList.innerHTML = history.map((item, index) => `
+                <div class="history-item">
+                    <div class="history-header">
+                        <span style="font-weight: 600;">Об'єктів: ${item.total}</span>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">${item.timestamp}</span>
+                    </div>
+                    <div class="image-container">
+                        <img src="${item.image}" alt="Result" class="history-image" onclick="openImageInResults(${index})">
+                    </div>
+                    <div class="history-tags">
+                        ${Object.entries(item.classes).map(([cls, count]) => 
+                            `<span class="history-tag">${cls}: ${count}</span>`
+                        ).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openImageInResults(index) {
+            const item = history[index];
+            if (!item) return;
+
+            resultImageUrl = item.image;
+            detections = item.detections || [];
+            classCounts = item.classes || {};
+
+            imagesGrid.innerHTML = `
+                <div class="image-container">
+                    <p>З історії</p>
+                    <img src="${resultImageUrl}" alt="Result">
+                </div>
+            `;
+
+            // Оновити статистику
+            updateStatistics();
+
+            // Оновити список детекцій
+            displayDetections();
+
+            // Оновити графік
+            displayChart();
+
+            detectBtn.disabled = true;
+            exportBtn.classList.remove('hidden');
+
+        }
+
+        function clearHistory() {
+            history = [];
+            localStorage.removeItem('detectionHistory');
+            historyCard.classList.add('hidden');
+        }
+
+        function exportResults() {
+            if (!resultImageUrl) return;
+
+            // Конвертувати base64 в blob
+            fetch(resultImageUrl)
+                .then(res => res.blob())
+                .then(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `detection_result_${Date.now()}.jpg`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorBox.classList.add('show');
+        }
+
+        function hideError() {
+            errorBox.classList.remove('show');
+        }
+    </script>
+</body>
+</html>
