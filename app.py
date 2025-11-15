@@ -7,7 +7,7 @@ import base64
 from datetime import datetime
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Завантаження моделі
 model = YOLO('best.pt')
@@ -84,4 +84,5 @@ def about():
     return send_from_directory('.', 'about.html')
 
 if __name__ == '__main__':
+
     app.run(host='0.0.0.0', port=5000)
